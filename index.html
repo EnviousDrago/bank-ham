@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Bank dem</title>
+<title>Bank Ham</title>
 
 <style>
   * { box-sizing: border-box; }
@@ -232,7 +232,7 @@
   <div class="panel-section">
     <div class="level-label">Level</div>
     <div id="level">1</div>
-    <div id="nextUnlock">Next: 500 hits</div>
+    <div id="nextUnlock">Next: Britta at 500 hits</div>
   </div>
 </div>
 
@@ -261,7 +261,8 @@ const people = [
       "jeg fik den LIGE på hovedt!!!!"
     ],
     rareBubbles: [
-      "walla jeg rammer tilbage din lille taber!!!!"
+      "walla jeg rammer tilbage din lille taber!!!!",
+      "fedt evan, fedt du har kage med"
     ]
   },
   {
@@ -270,7 +271,11 @@ const people = [
     unlockAt: 500,
     bubbles: [
       "jeg skriver hjem!!!!!!",
-      "ud fra klassen nu."
+      "ud fra klassen nu.",
+      "drenge.",
+      "det her et stille rum",
+      "ned i teskten op i karakter",
+      "alle sammen skal have mullighed at lære"
     ],
     rareBubbles: [
       "jeg chopper dig ned walla"
@@ -380,9 +385,9 @@ function maybeShowBubble() {
   const person = people[currentPerson];
   const roll = Math.random();
 
-  if (person.rareBubbles.length > 0 && roll < 0.015) {
+  if (person.rareBubbles.length > 0 && roll < 0.003) {
     showBubble(person.rareBubbles[Math.floor(Math.random() * person.rareBubbles.length)], true);
-  } else if (roll < 0.10) {
+  } else if (roll < 0.02) {
     showBubble(person.bubbles[Math.floor(Math.random() * person.bubbles.length)], false);
   }
 }
