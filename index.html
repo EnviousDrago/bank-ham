@@ -13,8 +13,8 @@
     margin: 0;
     min-height: 100vh;
     background:
-      linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+      linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px),
       radial-gradient(circle at top left, #3b1d1d, transparent 35%),
       radial-gradient(circle at bottom right, #1f3b35, transparent 35%),
       #0f0f0f;
@@ -31,22 +31,11 @@
     padding: 28px;
     font-size: 4.5rem;
     color: #ffdf5d;
-    text-shadow:
-      0 0 10px #ff3b3b,
-      0 0 25px #ff9900;
-  }
-
-  .layout {
-    min-height: calc(100vh - 130px);
-    display: grid;
-    grid-template-columns: 1fr 260px;
-    align-items: center;
-    gap: 30px;
-    padding: 20px 40px 60px;
+    text-shadow: 0 0 10px #ff3b3b, 0 0 25px #ff9900;
   }
 
   .game-area {
-    position: relative;
+    height: calc(100vh - 120px);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -57,9 +46,7 @@
     max-width: 70vw;
     border-radius: 14px;
     display: block;
-    box-shadow:
-      0 0 30px rgba(255, 223, 93, 0.25),
-      0 0 80px rgba(255, 70, 70, 0.15);
+    box-shadow: 0 0 30px rgba(255, 223, 93, 0.25);
   }
 
   #target.bonk {
@@ -73,93 +60,73 @@
   }
 
   .scoreboard {
+    position: fixed;
+    right: 25px;
+    top: 125px;
+    width: 230px;
+    padding: 22px;
     border: 3px solid #ffdf5d;
-    background: rgba(0, 0, 0, 0.55);
+    background: rgba(0, 0, 0, 0.72);
     border-radius: 14px;
-    padding: 24px;
-    box-shadow: 0 0 35px rgba(255, 223, 93, 0.22);
+    box-shadow: 0 0 35px rgba(255, 223, 93, 0.28);
+    z-index: 50;
   }
 
   .score-label {
-    font-size: 1.8rem;
+    font-size: 1.5rem;
     color: #ffdf5d;
-    margin-bottom: 10px;
   }
 
   #score {
-    font-size: 5rem;
+    font-size: 4.2rem;
     font-weight: bold;
     line-height: 1;
-  }
-
-  .cps-box {
-    margin-top: 22px;
-    padding-top: 18px;
-    border-top: 2px solid rgba(255, 223, 93, 0.5);
+    margin-bottom: 18px;
   }
 
   .cps-label {
-    font-size: 1.3rem;
+    font-size: 1.4rem;
     color: #ffdf5d;
+    border-top: 2px solid rgba(255, 223, 93, 0.45);
+    padding-top: 16px;
   }
 
   #cps {
-    font-size: 2.8rem;
+    font-size: 3rem;
     font-weight: bold;
-  }
-
-  .score-small {
-    margin-top: 10px;
-    font-size: 1.1rem;
-    opacity: 0.8;
   }
 
   .speech-bubble {
     position: fixed;
-    max-width: 280px;
-    padding: 14px 18px;
+    max-width: 310px;
+    padding: 15px 19px;
     background: white;
     color: #111;
     border: 3px solid #ffdf5d;
-    border-radius: 14px;
+    border-radius: 16px;
     font-size: 1.35rem;
     font-weight: bold;
     z-index: 9997;
     pointer-events: none;
-    animation: bubblePop 1.7s ease-out forwards;
-    box-shadow: 0 0 22px rgba(255, 223, 93, 0.35);
+    animation: bubblePop 1.8s ease-out forwards;
+    box-shadow: 0 0 22px rgba(255, 223, 93, 0.4);
   }
 
   .speech-bubble::after {
     content: "";
     position: absolute;
     left: 35px;
-    bottom: -16px;
-    border-width: 16px 12px 0 12px;
+    bottom: -15px;
+    border-width: 15px 12px 0 12px;
     border-style: solid;
     border-color: white transparent transparent transparent;
   }
 
   @keyframes bubblePop {
-    0% {
-      transform: scale(0.5) translateY(10px);
-      opacity: 0;
-    }
-
-    15% {
-      transform: scale(1) translateY(0);
-      opacity: 1;
-    }
-
-    75% {
-      transform: scale(1) translateY(0);
-      opacity: 1;
-    }
-
-    100% {
-      transform: scale(0.9) translateY(-20px);
-      opacity: 0;
-    }
+    0% { transform: scale(0.5) translateY(10px); opacity: 0; }
+    15% { transform: scale(1) translateY(0); opacity: 1; }
+    75% { transform: scale(1) translateY(0); opacity: 1; }
+    100% { transform: scale(0.9) translateY(-18px); opacity: 0; }
   }
 
   .hammer-cursor {
@@ -194,54 +161,8 @@
   }
 
   @keyframes hit {
-    0% {
-      transform: translate(-50%, -50%) scale(0.5);
-      opacity: 1;
-    }
-
-    100% {
-      transform: translate(-50%, -50%) scale(2);
-      opacity: 0;
-    }
-  }
-
-  .spark {
-    position: fixed;
-    left: 0;
-    top: 0;
-    color: #ffdf5d;
-    font-size: 26px;
-    pointer-events: none;
-    z-index: 9998;
-    animation: sparkFly 0.55s ease-out forwards;
-  }
-
-  @keyframes sparkFly {
-    0% {
-      transform: translate(-50%, -50%) scale(1);
-      opacity: 1;
-    }
-
-    100% {
-      transform: translate(var(--spark-x), var(--spark-y)) scale(0);
-      opacity: 0;
-    }
-  }
-
-  @media (max-width: 750px) {
-    h1 {
-      font-size: 3.2rem;
-    }
-
-    .layout {
-      grid-template-columns: 1fr;
-    }
-
-    .scoreboard {
-      order: -1;
-      width: 220px;
-      margin: 0 auto;
-    }
+    0% { transform: translate(-50%, -50%) scale(0.5); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(2); opacity: 0; }
   }
 </style>
 </head>
@@ -250,22 +171,16 @@
 
 <h1>Bank Ham</h1>
 
-<div class="layout">
-  <div class="game-area">
-    <img id="target" src="steen.png" alt="Steen">
-  </div>
+<div class="scoreboard">
+  <div class="score-label">Hits</div>
+  <div id="score">0</div>
 
-  <div class="scoreboard">
-    <div class="score-label">Hits</div>
-    <div id="score">0</div>
+  <div class="cps-label">CPS</div>
+  <div id="cps">0.0</div>
+</div>
 
-    <div class="cps-box">
-      <div class="cps-label">CPS</div>
-      <div id="cps">0.0</div>
-    </div>
-
-    <div class="score-small">keep bonking</div>
-  </div>
+<div class="game-area">
+  <img id="target" src="steen.png" alt="Steen">
 </div>
 
 <img class="hammer-cursor" src="hammer.png" alt="">
@@ -274,7 +189,7 @@
 const target = document.getElementById("target");
 const hammer = document.querySelector(".hammer-cursor");
 const score = document.getElementById("score");
-const cpsText = document.getElementById("cps");
+const cps = document.getElementById("cps");
 
 let hits = 0;
 let clickTimes = [];
@@ -291,29 +206,25 @@ window.addEventListener("mousemove", function(e) {
 
 function updateCps() {
   const now = Date.now();
-
-  clickTimes = clickTimes.filter(function(time) {
-    return now - time < 1000;
-  });
-
-  cpsText.textContent = clickTimes.length.toFixed(1);
+  clickTimes = clickTimes.filter(time => now - time < 1000);
+  cps.textContent = clickTimes.length.toFixed(1);
 }
 
-function showSpeechBubble() {
+function showBubble() {
   const rect = target.getBoundingClientRect();
   const bubble = document.createElement("div");
 
   bubble.className = "speech-bubble";
   bubble.textContent = bubbleTexts[Math.floor(Math.random() * bubbleTexts.length)];
 
-  bubble.style.left = (rect.left + rect.width * 0.58) + "px";
-  bubble.style.top = (rect.top - 75) + "px";
+  bubble.style.left = (rect.left + rect.width * 0.55) + "px";
+  bubble.style.top = (rect.top - 95) + "px";
 
   document.body.appendChild(bubble);
 
   setTimeout(() => {
     bubble.remove();
-  }, 1700);
+  }, 1800);
 }
 
 setInterval(updateCps, 100);
@@ -325,8 +236,8 @@ target.addEventListener("click", function(e) {
   clickTimes.push(Date.now());
   updateCps();
 
-  if (Math.random() < 0.28) {
-    showSpeechBubble();
+  if (hits === 1 || Math.random() < 0.35) {
+    showBubble();
   }
 
   const effect = document.createElement("div");
@@ -335,21 +246,6 @@ target.addEventListener("click", function(e) {
   effect.style.left = e.clientX + "px";
   effect.style.top = e.clientY + "px";
   document.body.appendChild(effect);
-
-  for (let i = 0; i < 8; i++) {
-    const spark = document.createElement("div");
-    spark.className = "spark";
-    spark.innerHTML = "✦";
-    spark.style.left = e.clientX + "px";
-    spark.style.top = e.clientY + "px";
-    spark.style.setProperty("--spark-x", (Math.random() * 180 - 90) + "px");
-    spark.style.setProperty("--spark-y", (Math.random() * 180 - 90) + "px");
-    document.body.appendChild(spark);
-
-    setTimeout(() => {
-      spark.remove();
-    }, 550);
-  }
 
   target.classList.remove("bonk");
   hammer.classList.remove("swing");
