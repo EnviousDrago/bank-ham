@@ -24,6 +24,15 @@
     overflow: hidden;
   }
 
+  body.event-active {
+    background:
+      linear-gradient(rgba(255, 220, 80, 0.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 220, 80, 0.08) 1px, transparent 1px),
+      radial-gradient(circle at center, #5b4200, transparent 40%),
+      #0f0f0f;
+    background-size: 45px 45px, 45px 45px, 100% 100%, 100% 100%;
+  }
+
   h1 {
     margin: 0;
     padding: 28px;
@@ -47,6 +56,10 @@
     box-shadow: 0 0 30px rgba(255, 223, 93, 0.25);
   }
 
+  body.event-active #target {
+    box-shadow: 0 0 35px #ffdf5d, 0 0 90px rgba(255, 223, 93, 0.45);
+  }
+
   #target.bonk {
     animation: bonk 0.16s ease;
   }
@@ -59,7 +72,7 @@
 
   .scoreboard, .selector {
     position: fixed;
-    width: 250px;
+    width: 260px;
     padding: 20px;
     border: 3px solid #ffdf5d;
     background: rgba(0, 0, 0, 0.72);
@@ -70,7 +83,7 @@
 
   .scoreboard {
     right: 25px;
-    top: 120px;
+    top: 105px;
   }
 
   .selector {
@@ -78,8 +91,8 @@
     top: 120px;
   }
 
-  .score-label, .cps-label, .level-label, .selector-title {
-    font-size: 1.35rem;
+  .score-label, .cps-label, .level-label, .selector-title, .combo-label, .hp-label {
+    font-size: 1.25rem;
     color: #ffdf5d;
   }
 
@@ -87,24 +100,44 @@
     font-size: 4rem;
     font-weight: bold;
     line-height: 1;
-    margin-bottom: 18px;
+    margin-bottom: 14px;
   }
 
-  #cps, #level {
-    font-size: 2.5rem;
+  #cps, #level, #combo {
+    font-size: 2.4rem;
     font-weight: bold;
   }
 
   .panel-section {
     border-top: 2px solid rgba(255, 223, 93, 0.45);
-    padding-top: 14px;
-    margin-top: 14px;
+    padding-top: 12px;
+    margin-top: 12px;
   }
 
-  #nextUnlock {
+  #nextUnlock, #saveText, #passiveText {
     margin-top: 8px;
     font-size: 0.95rem;
     opacity: 0.85;
+  }
+
+  .bar {
+    width: 100%;
+    height: 13px;
+    background: #222;
+    border: 1px solid rgba(255, 223, 93, 0.7);
+    border-radius: 99px;
+    overflow: hidden;
+    margin-top: 8px;
+  }
+
+  .bar-fill {
+    height: 100%;
+    width: 0%;
+    background: #ffdf5d;
+  }
+
+  #hpFill {
+    background: #ff4545;
   }
 
   .person-button {
@@ -128,6 +161,34 @@
   .person-button.locked {
     opacity: 0.45;
     border-color: #777;
+  }
+
+  .event-panel {
+    position: fixed;
+    left: 50%;
+    top: 105px;
+    transform: translateX(-50%);
+    width: 330px;
+    padding: 16px;
+    border: 3px solid white;
+    background: rgba(255, 204, 0, 0.92);
+    color: #111;
+    border-radius: 14px;
+    font-weight: bold;
+    z-index: 80;
+    box-shadow: 0 0 35px rgba(255, 223, 93, 0.7);
+  }
+
+  .event-panel.hidden {
+    display: none;
+  }
+
+  .event-title {
+    font-size: 1.5rem;
+  }
+
+  #jesperTimer {
+    font-size: 2.4rem;
   }
 
   .speech-bubble {
@@ -166,6 +227,16 @@
     border-color: #ff3b3b transparent transparent transparent;
   }
 
+  .speech-bubble.tail-right::after {
+    left: auto;
+    right: 35px;
+  }
+
+  .speech-bubble.tail-center::after {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
   @keyframes bubblePop {
     0% { transform: scale(0.5) translateY(10px); opacity: 0; }
     15% { transform: scale(1) translateY(0); opacity: 1; }
@@ -194,19 +265,35 @@
     100% { transform: translate(-22px, -20px) rotate(0deg); }
   }
 
-  .hit-effect {
+  .hit-effect, .critical-effect {
     position: fixed;
     left: 0;
     top: 0;
-    font-size: 75px;
     pointer-events: none;
     z-index: 9999;
+  }
+
+  .hit-effect {
+    font-size: 75px;
     animation: hit 0.5s ease-out forwards;
+  }
+
+  .critical-effect {
+    color: #ffdf5d;
+    font-size: 2rem;
+    font-weight: bold;
+    text-shadow: 0 0 10px #ff3b3b;
+    animation: crit 0.7s ease-out forwards;
   }
 
   @keyframes hit {
     0% { transform: translate(-50%, -50%) scale(0.5); opacity: 1; }
     100% { transform: translate(-50%, -50%) scale(2); opacity: 0; }
+  }
+
+  @keyframes crit {
+    0% { transform: translate(-50%, -50%) scale(0.7); opacity: 1; }
+    100% { transform: translate(-50%, -130%) scale(1.4); opacity: 0; }
   }
 </style>
 </head>
@@ -214,6 +301,13 @@
 <body>
 
 <h1>Bank Ham</h1>
+
+<div id="jesperPanel" class="event-panel hidden">
+  <div class="event-title">JESPER EVENT</div>
+  <div id="jesperTimer">10.0s</div>
+  <div id="jesperClicks">0 / 100 clicks</div>
+  <div class="bar"><div id="jesperFill" class="bar-fill"></div></div>
+</div>
 
 <div class="selector">
   <div class="selector-title">Choose Person</div>
@@ -230,9 +324,23 @@
   </div>
 
   <div class="panel-section">
+    <div class="combo-label">Combo</div>
+    <div id="combo">0x</div>
+    <div class="bar"><div id="comboFill" class="bar-fill"></div></div>
+  </div>
+
+  <div class="panel-section">
+    <div class="hp-label" id="hpLabel">HP</div>
+    <div id="hpText">100 / 100</div>
+    <div class="bar"><div id="hpFill" class="bar-fill"></div></div>
+  </div>
+
+  <div class="panel-section">
     <div class="level-label">Level</div>
     <div id="level">1</div>
-    <div id="nextUnlock">Next: Britta at 500 hits</div>
+    <div id="nextUnlock">Next: Britta at 750 hits</div>
+    <div id="passiveText">Jesper passive: locked</div>
+    <div id="saveText">Progress saved</div>
   </div>
 </div>
 
@@ -243,19 +351,32 @@
 <img class="hammer-cursor" src="hammer.png" alt="">
 
 <script>
+const SAVE_KEY = "bankHamSaveV4";
+
 const target = document.getElementById("target");
 const hammer = document.querySelector(".hammer-cursor");
 const score = document.getElementById("score");
 const cps = document.getElementById("cps");
 const level = document.getElementById("level");
 const nextUnlock = document.getElementById("nextUnlock");
+const passiveText = document.getElementById("passiveText");
 const personButtons = document.getElementById("personButtons");
+const combo = document.getElementById("combo");
+const comboFill = document.getElementById("comboFill");
+const hpLabel = document.getElementById("hpLabel");
+const hpText = document.getElementById("hpText");
+const hpFill = document.getElementById("hpFill");
+const jesperPanel = document.getElementById("jesperPanel");
+const jesperTimer = document.getElementById("jesperTimer");
+const jesperClicksText = document.getElementById("jesperClicks");
+const jesperFill = document.getElementById("jesperFill");
 
 const people = [
   {
     name: "Steen",
     file: "steen.png",
     unlockAt: 0,
+    maxHp: 100,
     bubbles: [
       "hvad fanden var det!!!!",
       "jeg fik den LIGE på hovedt!!!!"
@@ -268,12 +389,13 @@ const people = [
   {
     name: "Britta",
     file: "britta500.jpg",
-    unlockAt: 500,
+    unlockAt: 750,
+    maxHp: 160,
     bubbles: [
       "jeg skriver hjem!!!!!!",
       "ud fra klassen nu.",
       "drenge.",
-      "det her et stille rum",
+      "Hørte i det der? var min hjerte blev knust",
       "ned i teskten op i karakter",
       "alle sammen skal have mullighed at lære"
     ],
@@ -284,10 +406,11 @@ const people = [
   {
     name: "Mette",
     file: "mette1000.jpg",
-    unlockAt: 1000,
+    unlockAt: 1750,
+    maxHp: 240,
     bubbles: [
       "jeg gider ikk at diskuter",
-      "BOWLLINGGGGGGG"
+      "ej jeg kan ikke tænke idag"
     ],
     rareBubbles: []
   }
@@ -295,21 +418,77 @@ const people = [
 
 let hits = 0;
 let clickTimes = [];
-let currentPerson = 0;
+let selectedPerson = 0;
+let hpByPerson = people.map(person => person.maxHp);
+let comboCount = 0;
+let lastClickTime = 0;
+let comboResetTimer = null;
+let saveTimer = null;
 
-window.addEventListener("mousemove", function(e) {
-  hammer.style.left = e.clientX + "px";
-  hammer.style.top = e.clientY + "px";
-});
+let jesperPassiveUnlocked = false;
+let jesperEventActive = false;
+let jesperEventClicks = 0;
+let jesperEventEndTime = 0;
+let jesperEventTimer = null;
+
+function loadGame() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(SAVE_KEY));
+
+    if (!saved) return;
+
+    hits = saved.hits || 0;
+    selectedPerson = saved.selectedPerson || 0;
+    jesperPassiveUnlocked = saved.jesperPassiveUnlocked || false;
+
+    if (Array.isArray(saved.hpByPerson)) {
+      hpByPerson = people.map(function(person, index) {
+        return saved.hpByPerson[index] || person.maxHp;
+      });
+    }
+
+    if (!isUnlocked(selectedPerson)) {
+      selectedPerson = 0;
+    }
+  } catch (error) {
+    console.log("Could not load save.");
+  }
+}
+
+function saveGameNow() {
+  try {
+    localStorage.setItem(SAVE_KEY, JSON.stringify({
+      hits: hits,
+      selectedPerson: selectedPerson,
+      jesperPassiveUnlocked: jesperPassiveUnlocked,
+      hpByPerson: hpByPerson
+    }));
+  } catch (error) {
+    console.log("Could not save game.");
+  }
+}
+
+function scheduleSave() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(saveGameNow, 250);
+}
 
 function getLevel() {
-  if (hits >= 1000) return 3;
-  if (hits >= 500) return 2;
+  if (hits >= 1750) return 3;
+  if (hits >= 750) return 2;
   return 1;
 }
 
 function isUnlocked(personIndex) {
   return hits >= people[personIndex].unlockAt;
+}
+
+function addHits(amount) {
+  hits += amount;
+  score.textContent = hits;
+  updateLevelText();
+  renderPersonButtons();
+  scheduleSave();
 }
 
 function updateCps() {
@@ -321,13 +500,72 @@ function updateCps() {
 function updateLevelText() {
   level.textContent = getLevel();
 
-  if (hits < 500) {
-    nextUnlock.textContent = "Next: Britta at 500 hits";
-  } else if (hits < 1000) {
-    nextUnlock.textContent = "Next: Mette at 1000 hits";
+  if (hits < 750) {
+    nextUnlock.textContent = "Next: Britta at 750 hits";
+  } else if (hits < 1750) {
+    nextUnlock.textContent = "Next: Mette at 1750 hits";
   } else {
     nextUnlock.textContent = "All people unlocked";
   }
+
+  passiveText.textContent = jesperPassiveUnlocked
+    ? "Jesper passive: +10 CPS"
+    : "Jesper passive: locked";
+}
+
+function updateHp() {
+  if (jesperEventActive) {
+    hpLabel.textContent = "Jesper Goal";
+    hpText.textContent = jesperEventClicks + " / 100";
+    hpFill.style.width = jesperEventClicks + "%";
+    return;
+  }
+
+  const person = people[selectedPerson];
+  const hp = hpByPerson[selectedPerson];
+
+  hpLabel.textContent = person.name + " HP";
+  hpText.textContent = hp + " / " + person.maxHp;
+  hpFill.style.width = ((hp / person.maxHp) * 100) + "%";
+}
+
+function damagePerson(amount) {
+  if (jesperEventActive) return;
+
+  const person = people[selectedPerson];
+  hpByPerson[selectedPerson] -= amount;
+
+  if (hpByPerson[selectedPerson] <= 0) {
+    hpByPerson[selectedPerson] = person.maxHp;
+    showBubble(person.name + " got knocked out!", true);
+  }
+
+  updateHp();
+  scheduleSave();
+}
+
+function updateCombo() {
+  combo.textContent = comboCount + "x";
+  comboFill.style.width = Math.min(100, comboCount * 2) + "%";
+}
+
+function registerComboClick() {
+  const now = Date.now();
+
+  if (now - lastClickTime < 700) {
+    comboCount++;
+  } else {
+    comboCount = 1;
+  }
+
+  lastClickTime = now;
+  updateCombo();
+
+  clearTimeout(comboResetTimer);
+  comboResetTimer = setTimeout(function() {
+    comboCount = 0;
+    updateCombo();
+  }, 1200);
 }
 
 function renderPersonButtons() {
@@ -340,7 +578,7 @@ function renderPersonButtons() {
       ? person.name
       : person.name + " - locked";
 
-    if (index === currentPerson) {
+    if (index === selectedPerson) {
       button.classList.add("active");
     }
 
@@ -349,15 +587,23 @@ function renderPersonButtons() {
     }
 
     button.addEventListener("click", function() {
+      if (jesperEventActive) {
+        showBubble("Finish the Jesper event first!", true);
+        return;
+      }
+
       if (!isUnlocked(index)) {
         showBubble("Unlock at " + person.unlockAt + " hits!", false);
         return;
       }
 
-      currentPerson = index;
+      selectedPerson = index;
       target.src = person.file;
+      target.alt = person.name;
       renderPersonButtons();
+      updateHp();
       showBubble(person.name + " selected!", false);
+      scheduleSave();
     });
 
     personButtons.appendChild(button);
@@ -367,22 +613,43 @@ function renderPersonButtons() {
 function showBubble(text, rare) {
   const rect = target.getBoundingClientRect();
   const bubble = document.createElement("div");
+  const positions = ["left", "right", "top"];
+  const position = positions[Math.floor(Math.random() * positions.length)];
 
   bubble.className = rare ? "speech-bubble rare" : "speech-bubble";
   bubble.textContent = text;
 
-  bubble.style.left = Math.min(window.innerWidth - 350, rect.left + rect.width * 0.55) + "px";
-  bubble.style.top = Math.max(85, rect.top - 95) + "px";
+  let left;
+  let top;
+
+  if (position === "left") {
+    left = rect.left - 345;
+    top = rect.top + 20;
+    bubble.classList.add("tail-right");
+  } else if (position === "right") {
+    left = rect.right + 20;
+    top = rect.top + 20;
+  } else {
+    left = rect.left + rect.width / 2 - 165;
+    top = rect.top - 105;
+    bubble.classList.add("tail-center");
+  }
+
+  left = Math.max(12, Math.min(window.innerWidth - 350, left));
+  top = Math.max(85, Math.min(window.innerHeight - 125, top));
+
+  bubble.style.left = left + "px";
+  bubble.style.top = top + "px";
 
   document.body.appendChild(bubble);
 
-  setTimeout(() => {
+  setTimeout(function() {
     bubble.remove();
   }, 1800);
 }
 
 function maybeShowBubble() {
-  const person = people[currentPerson];
+  const person = people[selectedPerson];
   const roll = Math.random();
 
   if (person.rareBubbles.length > 0 && roll < 0.003) {
@@ -392,27 +659,107 @@ function maybeShowBubble() {
   }
 }
 
-setInterval(updateCps, 100);
-updateLevelText();
-renderPersonButtons();
+function maybeStartJesperEvent() {
+  if (jesperPassiveUnlocked || jesperEventActive || hits < 250) return;
 
-target.addEventListener("click", function(e) {
-  hits++;
-  score.textContent = hits;
+  if (Math.random() < 0.0011) {
+    const testImage = new Image();
 
-  clickTimes.push(Date.now());
-  updateCps();
+    testImage.onload = function() {
+      startJesperEvent();
+    };
+
+    testImage.onerror = function() {
+      showBubble("Upload jesper.jpg first!", true);
+    };
+
+    testImage.src = "jesper.jpg";
+  }
+}
+
+function startJesperEvent() {
+  jesperEventActive = true;
+  jesperEventClicks = 0;
+  jesperEventEndTime = Date.now() + 10000;
+
+  document.body.classList.add("event-active");
+  jesperPanel.classList.remove("hidden");
+  target.src = "jesper.jpg";
+  target.alt = "Jesper";
+  hammer.src = "trimmer.jpg";
+
+  showBubble("JESPER APPEARED! 100 clicks in 10 seconds!", true);
+  updateJesperEvent();
+
+  clearInterval(jesperEventTimer);
+  jesperEventTimer = setInterval(updateJesperEvent, 100);
+}
+
+function updateJesperEvent() {
+  if (!jesperEventActive) return;
+
+  const timeLeft = Math.max(0, jesperEventEndTime - Date.now());
+  const seconds = (timeLeft / 1000).toFixed(1);
+
+  jesperTimer.textContent = seconds + "s";
+  jesperClicksText.textContent = jesperEventClicks + " / 100 clicks";
+  jesperFill.style.width = jesperEventClicks + "%";
+  updateHp();
+
+  if (timeLeft <= 0 && jesperEventClicks < 100) {
+    finishJesperEvent(false);
+  }
+}
+
+function finishJesperEvent(success) {
+  jesperEventActive = false;
+  clearInterval(jesperEventTimer);
+
+  document.body.classList.remove("event-active");
+  jesperPanel.classList.add("hidden");
+  hammer.src = "hammer.png";
+  target.src = people[selectedPerson].file;
+  target.alt = people[selectedPerson].name;
+
+  if (success) {
+    jesperPassiveUnlocked = true;
+    showBubble("Jesper passive unlocked! +10 CPS!", true);
+  } else {
+    showBubble("Jesper escaped!", true);
+  }
+
+  updateHp();
   updateLevelText();
-  renderPersonButtons();
-  maybeShowBubble();
+  scheduleSave();
+}
 
+function createHitEffect(x, y, critical) {
   const effect = document.createElement("div");
   effect.className = "hit-effect";
-  effect.innerHTML = "💥";
-  effect.style.left = e.clientX + "px";
-  effect.style.top = e.clientY + "px";
+  effect.innerHTML = critical ? "💥" : "💢";
+  effect.style.left = x + "px";
+  effect.style.top = y + "px";
   document.body.appendChild(effect);
 
+  setTimeout(function() {
+    effect.remove();
+  }, 500);
+
+  if (critical) {
+    const crit = document.createElement("div");
+    crit.className = "critical-effect";
+    crit.textContent = "CRITICAL +10";
+    crit.style.left = x + "px";
+    crit.style.top = (y - 35) + "px";
+    document.body.appendChild(crit);
+
+    setTimeout(function() {
+      crit.remove();
+    }, 700);
+  }
+}
+
+function animateTarget() {
   target.classList.remove("bonk");
   hammer.classList.remove("swing");
 
@@ -421,11 +768,64 @@ target.addEventListener("click", function(e) {
 
   target.classList.add("bonk");
   hammer.classList.add("swing");
+}
 
-  setTimeout(() => {
-    effect.remove();
-  }, 500);
+window.addEventListener("mousemove", function(e) {
+  hammer.style.left = e.clientX + "px";
+  hammer.style.top = e.clientY + "px";
 });
+
+target.addEventListener("click", function(e) {
+  clickTimes.push(Date.now());
+  registerComboClick();
+
+  if (jesperEventActive) {
+    jesperEventClicks++;
+    addHits(1);
+    updateJesperEvent();
+
+    if (jesperEventClicks >= 100) {
+      finishJesperEvent(true);
+    }
+  } else {
+    const critical = Math.random() < 0.02;
+    const damage = critical ? 10 : 1;
+
+    addHits(damage);
+    damagePerson(damage);
+    maybeShowBubble();
+    maybeStartJesperEvent();
+
+    createHitEffect(e.clientX, e.clientY, critical);
+  }
+
+  if (jesperEventActive) {
+    createHitEffect(e.clientX, e.clientY, false);
+  }
+
+  animateTarget();
+});
+
+setInterval(updateCps, 100);
+
+setInterval(function() {
+  if (!jesperPassiveUnlocked || jesperEventActive) return;
+
+  clickTimes.push(Date.now());
+  addHits(1);
+  damagePerson(1);
+}, 100);
+
+window.addEventListener("beforeunload", saveGameNow);
+
+loadGame();
+score.textContent = hits;
+target.src = people[selectedPerson].file;
+target.alt = people[selectedPerson].name;
+updateLevelText();
+updateHp();
+updateCombo();
+renderPersonButtons();
 </script>
 
 </body>
