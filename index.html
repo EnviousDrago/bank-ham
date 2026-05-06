@@ -1,17 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>Bank Ham</title>
-
 <style>
   body {
     margin: 0;
     background: #0f0f0f;
     color: white;
     text-align: center;
-    font-family: Arial;
-    cursor: url('hammer.png'), auto;
+    font-family: Arial, sans-serif;
+    cursor: url("hammer.png") 16 16, auto;
   }
 
   h1 {
@@ -22,63 +16,34 @@
   .container {
     margin-top: 50px;
     position: relative;
+    display: inline-block;
   }
 
   img {
     width: 300px;
     border-radius: 10px;
     transition: transform 0.1s;
+    display: block;
   }
 
   .hit-effect {
     position: absolute;
-    width: 80px;
-    height: 80px;
+    font-size: 55px;
     pointer-events: none;
-    animation: hit 0.3s ease-out forwards;
+    z-index: 10;
+    transform: translate(-50%, -50%);
+    animation: hit 0.35s ease-out forwards;
   }
 
   @keyframes hit {
-    0% { transform: scale(50); opacity: 1; }
-    100% { transform: scale(1.5); opacity: 0; }
+    0% {
+      transform: translate(-50%, -50%) scale(0.4);
+      opacity: 1;
+    }
+
+    100% {
+      transform: translate(-50%, -50%) scale(1.8);
+      opacity: 0;
+    }
   }
 </style>
-</head>
-
-<body>
-
-<h1>Bank Ham</h1>
-
-<div class="container">
-  <img id="target" src="steen.png" alt="Steen">
-</div>
-
-<script>
-const target = document.getElementById("target");
-
-target.addEventListener("click", function(e) {
-  // small "hit" animation on image
-  target.style.transform = "scale(0.95)";
-  setTimeout(() => {
-    target.style.transform = "scale(1)";
-  }, 100);
-
-  // create hit effect
-  const effect = document.createElement("div");
-  effect.className = "hit-effect";
-  effect.style.left = (e.offsetX - 20) + "px";
-  effect.style.top = (e.offsetY - 120) + "px";
-
-  // optional: emoji effect
-  effect.innerHTML = "💥";
-
-  document.querySelector(".container").appendChild(effect);
-
-  setTimeout(() => {
-    effect.remove();
-  }, 300);
-});
-</script>
-
-</body>
-</html>
