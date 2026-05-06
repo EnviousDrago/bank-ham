@@ -46,6 +46,7 @@
   }
 
   .game-area {
+    position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -91,10 +92,74 @@
     line-height: 1;
   }
 
+  .cps-box {
+    margin-top: 22px;
+    padding-top: 18px;
+    border-top: 2px solid rgba(255, 223, 93, 0.5);
+  }
+
+  .cps-label {
+    font-size: 1.3rem;
+    color: #ffdf5d;
+  }
+
+  #cps {
+    font-size: 2.8rem;
+    font-weight: bold;
+  }
+
   .score-small {
     margin-top: 10px;
     font-size: 1.1rem;
     opacity: 0.8;
+  }
+
+  .speech-bubble {
+    position: fixed;
+    max-width: 280px;
+    padding: 14px 18px;
+    background: white;
+    color: #111;
+    border: 3px solid #ffdf5d;
+    border-radius: 14px;
+    font-size: 1.35rem;
+    font-weight: bold;
+    z-index: 9997;
+    pointer-events: none;
+    animation: bubblePop 1.7s ease-out forwards;
+    box-shadow: 0 0 22px rgba(255, 223, 93, 0.35);
+  }
+
+  .speech-bubble::after {
+    content: "";
+    position: absolute;
+    left: 35px;
+    bottom: -16px;
+    border-width: 16px 12px 0 12px;
+    border-style: solid;
+    border-color: white transparent transparent transparent;
+  }
+
+  @keyframes bubblePop {
+    0% {
+      transform: scale(0.5) translateY(10px);
+      opacity: 0;
+    }
+
+    15% {
+      transform: scale(1) translateY(0);
+      opacity: 1;
+    }
+
+    75% {
+      transform: scale(1) translateY(0);
+      opacity: 1;
+    }
+
+    100% {
+      transform: scale(0.9) translateY(-20px);
+      opacity: 0;
+    }
   }
 
   .hammer-cursor {
@@ -193,6 +258,12 @@
   <div class="scoreboard">
     <div class="score-label">Hits</div>
     <div id="score">0</div>
+
+    <div class="cps-box">
+      <div class="cps-label">CPS</div>
+      <div id="cps">0.0</div>
+    </div>
+
     <div class="score-small">keep bonking</div>
   </div>
 </div>
@@ -203,17 +274,60 @@
 const target = document.getElementById("target");
 const hammer = document.querySelector(".hammer-cursor");
 const score = document.getElementById("score");
+const cpsText = document.getElementById("cps");
 
 let hits = 0;
+let clickTimes = [];
+
+const bubbleTexts = [
+  "hvad fanden var det!!!!",
+  "jeg fik den LIGE på hovedt!!!!"
+];
 
 window.addEventListener("mousemove", function(e) {
   hammer.style.left = e.clientX + "px";
   hammer.style.top = e.clientY + "px";
 });
 
+function updateCps() {
+  const now = Date.now();
+
+  clickTimes = clickTimes.filter(function(time) {
+    return now - time < 1000;
+  });
+
+  cpsText.textContent = clickTimes.length.toFixed(1);
+}
+
+function showSpeechBubble() {
+  const rect = target.getBoundingClientRect();
+  const bubble = document.createElement("div");
+
+  bubble.className = "speech-bubble";
+  bubble.textContent = bubbleTexts[Math.floor(Math.random() * bubbleTexts.length)];
+
+  bubble.style.left = (rect.left + rect.width * 0.58) + "px";
+  bubble.style.top = (rect.top - 75) + "px";
+
+  document.body.appendChild(bubble);
+
+  setTimeout(() => {
+    bubble.remove();
+  }, 1700);
+}
+
+setInterval(updateCps, 100);
+
 target.addEventListener("click", function(e) {
   hits++;
   score.textContent = hits;
+
+  clickTimes.push(Date.now());
+  updateCps();
+
+  if (Math.random() < 0.28) {
+    showSpeechBubble();
+  }
 
   const effect = document.createElement("div");
   effect.className = "hit-effect";
