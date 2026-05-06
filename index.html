@@ -39,7 +39,7 @@
   }
 
   @keyframes hit {
-    0% { transform: scale(0.5); opacity: 1; }
+    0% { transform: scale(50); opacity: 1; }
     100% { transform: scale(1.5); opacity: 0; }
   }
 </style>
@@ -50,7 +50,7 @@
 <h1>Bank Ham</h1>
 
 <div class="container">
-  <img id="target" src="steen.png" alt="AI Person">
+  <img id="target" src="steen.png" alt="Steen">
 </div>
 
 <script>
@@ -66,8 +66,8 @@ target.addEventListener("click", function(e) {
   // create hit effect
   const effect = document.createElement("div");
   effect.className = "hit-effect";
-  effect.style.left = (e.offsetX - 40) + "px";
-  effect.style.top = (e.offsetY - 40) + "px";
+  effect.style.left = (e.offsetX - 20) + "px";
+  effect.style.top = (e.offsetY - 120) + "px";
 
   // optional: emoji effect
   effect.innerHTML = "💥";
