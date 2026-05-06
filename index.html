@@ -5,9 +5,7 @@
 <title>Bank Ham</title>
 
 <style>
-  * {
-    box-sizing: border-box;
-  }
+  * { box-sizing: border-box; }
 
   body {
     margin: 0;
@@ -62,8 +60,8 @@
   .scoreboard {
     position: fixed;
     right: 25px;
-    top: 125px;
-    width: 230px;
+    top: 120px;
+    width: 245px;
     padding: 22px;
     border: 3px solid #ffdf5d;
     background: rgba(0, 0, 0, 0.72);
@@ -72,33 +70,38 @@
     z-index: 50;
   }
 
-  .score-label {
-    font-size: 1.5rem;
+  .score-label, .cps-label, .level-label {
+    font-size: 1.35rem;
     color: #ffdf5d;
   }
 
   #score {
-    font-size: 4.2rem;
+    font-size: 4rem;
     font-weight: bold;
     line-height: 1;
     margin-bottom: 18px;
   }
 
-  .cps-label {
-    font-size: 1.4rem;
-    color: #ffdf5d;
-    border-top: 2px solid rgba(255, 223, 93, 0.45);
-    padding-top: 16px;
+  #cps, #level {
+    font-size: 2.5rem;
+    font-weight: bold;
   }
 
-  #cps {
-    font-size: 3rem;
-    font-weight: bold;
+  .panel-section {
+    border-top: 2px solid rgba(255, 223, 93, 0.45);
+    padding-top: 14px;
+    margin-top: 14px;
+  }
+
+  #nextUnlock {
+    margin-top: 8px;
+    font-size: 0.95rem;
+    opacity: 0.85;
   }
 
   .speech-bubble {
     position: fixed;
-    max-width: 310px;
+    max-width: 330px;
     padding: 15px 19px;
     background: white;
     color: #111;
@@ -112,6 +115,12 @@
     box-shadow: 0 0 22px rgba(255, 223, 93, 0.4);
   }
 
+  .speech-bubble.rare {
+    background: #ff3b3b;
+    color: white;
+    border-color: white;
+  }
+
   .speech-bubble::after {
     content: "";
     position: absolute;
@@ -120,6 +129,10 @@
     border-width: 15px 12px 0 12px;
     border-style: solid;
     border-color: white transparent transparent transparent;
+  }
+
+  .speech-bubble.rare::after {
+    border-color: #ff3b3b transparent transparent transparent;
   }
 
   @keyframes bubblePop {
@@ -175,8 +188,16 @@
   <div class="score-label">Hits</div>
   <div id="score">0</div>
 
-  <div class="cps-label">CPS</div>
-  <div id="cps">0.0</div>
+  <div class="panel-section">
+    <div class="cps-label">CPS</div>
+    <div id="cps">0.0</div>
+  </div>
+
+  <div class="panel-section">
+    <div class="level-label">Level</div>
+    <div id="level">1</div>
+    <div id="nextUnlock">Next: 500 hits</div>
+  </div>
 </div>
 
 <div class="game-area">
@@ -190,14 +211,28 @@ const target = document.getElementById("target");
 const hammer = document.querySelector(".hammer-cursor");
 const score = document.getElementById("score");
 const cps = document.getElementById("cps");
+const level = document.getElementById("level");
+const nextUnlock = document.getElementById("nextUnlock");
 
-let hits = 0;
-let clickTimes = [];
+const people = [
+  { file: "steen.png", unlockAt: 0 },
+  { file: "britta500.png", unlockAt: 500 },
+  { file: "mette1000.png", unlockAt: 1000 }
+];
 
-const bubbleTexts = [
+const normalBubbles = [
   "hvad fanden var det!!!!",
   "jeg fik den LIGE på hovedt!!!!"
 ];
+
+const rareBubbles = [
+  "walla jeg rammer tilbage din lille taber!!!!"
+];
+
+let hits = 0;
+let clickTimes = [];
+let currentPerson = 0;
+let triedUnlock = {};
 
 window.addEventListener("mousemove", function(e) {
   hammer.style.left = e.clientX + "px";
@@ -210,15 +245,27 @@ function updateCps() {
   cps.textContent = clickTimes.length.toFixed(1);
 }
 
-function showBubble() {
+function updateLevelText() {
+  level.textContent = currentPerson + 1;
+
+  if (currentPerson === 0) {
+    nextUnlock.textContent = "Next: 500 hits";
+  } else if (currentPerson === 1) {
+    nextUnlock.textContent = "Next: 1000 hits";
+  } else {
+    nextUnlock.textContent = "Max level";
+  }
+}
+
+function showBubble(text, rare) {
   const rect = target.getBoundingClientRect();
   const bubble = document.createElement("div");
 
-  bubble.className = "speech-bubble";
-  bubble.textContent = bubbleTexts[Math.floor(Math.random() * bubbleTexts.length)];
+  bubble.className = rare ? "speech-bubble rare" : "speech-bubble";
+  bubble.textContent = text;
 
-  bubble.style.left = (rect.left + rect.width * 0.55) + "px";
-  bubble.style.top = (rect.top - 95) + "px";
+  bubble.style.left = Math.min(window.innerWidth - 350, rect.left + rect.width * 0.55) + "px";
+  bubble.style.top = Math.max(85, rect.top - 95) + "px";
 
   document.body.appendChild(bubble);
 
@@ -227,7 +274,47 @@ function showBubble() {
   }, 1800);
 }
 
+function maybeShowBubble() {
+  const roll = Math.random();
+
+  if (roll < 0.015) {
+    showBubble(rareBubbles[Math.floor(Math.random() * rareBubbles.length)], true);
+  } else if (roll < 0.11) {
+    showBubble(normalBubbles[Math.floor(Math.random() * normalBubbles.length)], false);
+  }
+}
+
+function tryUnlockPerson(personIndex) {
+  if (personIndex <= currentPerson || triedUnlock[personIndex]) return;
+
+  triedUnlock[personIndex] = true;
+
+  const testImage = new Image();
+
+  testImage.onload = function() {
+    currentPerson = personIndex;
+    target.src = people[personIndex].file;
+    updateLevelText();
+    showBubble("NEW PERSON UNLOCKED!!!!", false);
+  };
+
+  testImage.onerror = function() {
+    showBubble("Upload " + people[personIndex].file + " first!", false);
+  };
+
+  testImage.src = people[personIndex].file + "?check=" + Date.now();
+}
+
+function checkUnlocks() {
+  if (hits >= 1000) {
+    tryUnlockPerson(2);
+  } else if (hits >= 500) {
+    tryUnlockPerson(1);
+  }
+}
+
 setInterval(updateCps, 100);
+updateLevelText();
 
 target.addEventListener("click", function(e) {
   hits++;
@@ -235,10 +322,8 @@ target.addEventListener("click", function(e) {
 
   clickTimes.push(Date.now());
   updateCps();
-
-  if (hits === 1 || Math.random() < 0.35) {
-    showBubble();
-  }
+  checkUnlocks();
+  maybeShowBubble();
 
   const effect = document.createElement("div");
   effect.className = "hit-effect";
