@@ -241,6 +241,25 @@
     transition: transform 0.48s linear, opacity 0.48s linear;
   }
 
+  .golden-ring {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 170px;
+    height: 170px;
+    border: 7px solid #ffdf5d;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9995;
+    box-shadow: 0 0 20px #ffdf5d, 0 0 55px rgba(255, 223, 93, 0.8);
+    animation: goldenRing 0.9s ease-out forwards;
+  }
+
+  @keyframes goldenRing {
+    0% { transform: translate(-50%, -50%) scale(0.2); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(3); opacity: 0; }
+  }
+
   .speech-bubble {
     position: fixed;
     max-width: 330px;
@@ -358,7 +377,7 @@
 </div>
 
 <div id="jesperHelper" class="jesper-helper hidden">
-  <img src="jesper.png" alt="Jesper helper">
+  <img src="jesper.jpg" alt="Jesper helper">
 </div>
 
 <div class="selector">
@@ -430,6 +449,8 @@ const people = [
     file: "steen.png",
     unlockAt: 0,
     maxHp: 100,
+    jesperChance: 0.004,
+    jesperPityLimit: 260,
     bubbles: ["hvad fanden var det!!!!", "jeg fik den LIGE på hovedt!!!!"],
     rareBubbles: ["walla jeg rammer tilbage din lille taber!!!!", "fedt evan, fedt du har kage med"]
   },
@@ -438,6 +459,8 @@ const people = [
     file: "britta500.jpg",
     unlockAt: 750,
     maxHp: 160,
+    jesperChance: 0.005,
+    jesperPityLimit: 230,
     bubbles: [
       "jeg skriver hjem!!!!!!",
       "ud fra klassen nu.",
@@ -453,6 +476,8 @@ const people = [
     file: "mette1000.jpg",
     unlockAt: 1750,
     maxHp: 240,
+    jesperChance: 0.006,
+    jesperPityLimit: 200,
     bubbles: ["jeg gider ikk at diskuter", "BOWLLINGGGGGGG"],
     rareBubbles: []
   }
@@ -472,6 +497,7 @@ let jesperEventActive = false;
 let jesperEventClicks = 0;
 let jesperEventEndTime = 0;
 let jesperEventTimer = null;
+let jesperMisses = 0;
 
 function loadGame() {
   try {
@@ -481,6 +507,7 @@ function loadGame() {
     hits = saved.hits || 0;
     selectedPerson = saved.selectedPerson || 0;
     jesperPassiveUnlocked = saved.jesperPassiveUnlocked || false;
+    jesperMisses = saved.jesperMisses || 0;
 
     if (Array.isArray(saved.hpByPerson)) {
       hpByPerson = people.map(function(person, index) {
@@ -502,6 +529,7 @@ function saveGameNow() {
       hits: hits,
       selectedPerson: selectedPerson,
       jesperPassiveUnlocked: jesperPassiveUnlocked,
+      jesperMisses: jesperMisses,
       hpByPerson: hpByPerson
     }));
   } catch (error) {
@@ -706,7 +734,7 @@ function maybeShowBubble() {
 }
 
 function showJesperHelperBubble() {
-  if (Math.random() > 0.08) return;
+  if (Math.random() > 0.03) return;
 
   const oldBubble = jesperHelper.querySelector(".helper-bubble");
   if (oldBubble) oldBubble.remove();
@@ -755,7 +783,10 @@ function throwTrimmerFromJesper() {
   setTimeout(function() {
     projectile.remove();
 
-    clickTimes.push(Date.now());
+    for (let i = 0; i < 10; i++) {
+      clickTimes.push(Date.now());
+    }
+
     addHits(10);
     damagePerson(10);
     createHitEffect(endX, endY, true);
@@ -767,19 +798,43 @@ function throwTrimmerFromJesper() {
 function maybeStartJesperEvent() {
   if (jesperPassiveUnlocked || jesperEventActive || hits < 250) return;
 
-  if (Math.random() < 0.0011) {
-    const testImage = new Image();
+  const person = people[selectedPerson];
 
-    testImage.onload = function() {
-      startJesperEvent();
-    };
+  jesperMisses++;
 
-    testImage.onerror = function() {
-      showBubble("Upload jesper.png first!", true);
-    };
+  const gotLucky = Math.random() < person.jesperChance;
+  const hitPityLimit = jesperMisses >= person.jesperPityLimit;
 
-    testImage.src = "jesper.png";
-  }
+  if (!gotLucky && !hitPityLimit) return;
+
+  const testImage = new Image();
+
+  testImage.onload = function() {
+    jesperMisses = 0;
+    startJesperEvent();
+    scheduleSave();
+  };
+
+  testImage.onerror = function() {
+    showBubble("Upload jesper.jpg first!", true);
+  };
+
+  testImage.src = "jesper.jpg?check=" + Date.now();
+}
+
+function showGoldenRing() {
+  const rect = target.getBoundingClientRect();
+  const ring = document.createElement("div");
+
+  ring.className = "golden-ring";
+  ring.style.left = (rect.left + rect.width / 2) + "px";
+  ring.style.top = (rect.top + rect.height / 2) + "px";
+
+  document.body.appendChild(ring);
+
+  setTimeout(function() {
+    ring.remove();
+  }, 900);
 }
 
 function startJesperEvent() {
@@ -794,7 +849,8 @@ function startJesperEvent() {
   hammer.src = "trimmer.png";
 
   updateJesperHelper();
-  showBubble("JESPER APPEARED! 100 clicks in 10 seconds NOW!", true);
+  setTimeout(showGoldenRing, 80);
+  showBubble("JESPER APPEARED! 100 clicks in 10 seconds!", true);
   updateJesperEvent();
 
   clearInterval(jesperEventTimer);
