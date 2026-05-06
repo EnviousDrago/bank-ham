@@ -5,13 +5,19 @@
 <title>Bank Ham</title>
 
 <style>
+  html,
+  body,
+  .container,
+  #target {
+    cursor: url("./hammer.png") 16 16, pointer;
+  }
+
   body {
     margin: 0;
     background: #0f0f0f;
     color: white;
     text-align: center;
     font-family: Arial, sans-serif;
-    cursor: url("hammer.png") 16 16, auto;
   }
 
   h1 {
@@ -30,7 +36,6 @@
     border-radius: 10px;
     transition: transform 0.1s;
     display: block;
-    cursor: url("hammer.png") 16 16, pointer;
   }
 
   .hit-effect {
@@ -78,8 +83,10 @@ target.addEventListener("click", function(e) {
   effect.className = "hit-effect";
   effect.innerHTML = "💥";
 
-  effect.style.left = e.offsetX + "px";
-  effect.style.top = e.offsetY + "px";
+  const rect = target.getBoundingClientRect();
+
+  effect.style.left = (e.clientX - rect.left) + "px";
+  effect.style.top = (e.clientY - rect.top) + "px";
 
   container.appendChild(effect);
 
