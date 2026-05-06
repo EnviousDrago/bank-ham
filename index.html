@@ -60,9 +60,7 @@
     box-shadow: 0 0 35px #ffdf5d, 0 0 90px rgba(255, 223, 93, 0.45);
   }
 
-  #target.bonk {
-    animation: bonk 0.16s ease;
-  }
+  #target.bonk { animation: bonk 0.16s ease; }
 
   @keyframes bonk {
     0% { transform: scale(1) rotate(0deg); }
@@ -136,9 +134,7 @@
     background: #ffdf5d;
   }
 
-  #hpFill {
-    background: #ff4545;
-  }
+  #hpFill { background: #ff4545; }
 
   .person-button {
     width: 100%;
@@ -179,16 +175,70 @@
     box-shadow: 0 0 35px rgba(255, 223, 93, 0.7);
   }
 
-  .event-panel.hidden {
-    display: none;
+  .hidden { display: none; }
+
+  .event-title { font-size: 1.5rem; }
+
+  #jesperTimer { font-size: 2.4rem; }
+
+  .jesper-helper {
+    position: fixed;
+    left: 28px;
+    bottom: 25px;
+    z-index: 70;
+    width: 135px;
+    text-align: center;
+    pointer-events: none;
   }
 
-  .event-title {
-    font-size: 1.5rem;
+  .jesper-helper img {
+    width: 110px;
+    border-radius: 12px;
+    border: 3px solid #ffdf5d;
+    background: rgba(0, 0, 0, 0.55);
+    box-shadow: 0 0 24px rgba(255, 223, 93, 0.45);
   }
 
-  #jesperTimer {
-    font-size: 2.4rem;
+  .jesper-helper.throwing img {
+    animation: helperThrow 0.35s ease;
+  }
+
+  @keyframes helperThrow {
+    0% { transform: rotate(0deg) scale(1); }
+    45% { transform: rotate(-10deg) scale(1.08); }
+    100% { transform: rotate(0deg) scale(1); }
+  }
+
+  .helper-bubble {
+    position: absolute;
+    left: 95px;
+    bottom: 105px;
+    width: 175px;
+    padding: 10px 12px;
+    background: white;
+    color: #111;
+    border: 3px solid #ffdf5d;
+    border-radius: 14px;
+    font-size: 1.05rem;
+    font-weight: bold;
+    animation: helperBubble 1.6s ease-out forwards;
+  }
+
+  @keyframes helperBubble {
+    0% { transform: scale(0.5); opacity: 0; }
+    15% { transform: scale(1); opacity: 1; }
+    80% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(0.85) translateY(-10px); opacity: 0; }
+  }
+
+  .trimmer-projectile {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 58px;
+    z-index: 9996;
+    pointer-events: none;
+    transition: transform 0.48s linear, opacity 0.48s linear;
   }
 
   .speech-bubble {
@@ -255,9 +305,7 @@
     transform-origin: 70% 70%;
   }
 
-  .hammer-cursor.swing {
-    animation: hammerSwing 0.18s ease;
-  }
+  .hammer-cursor.swing { animation: hammerSwing 0.18s ease; }
 
   @keyframes hammerSwing {
     0% { transform: translate(-22px, -20px) rotate(0deg); }
@@ -309,6 +357,10 @@
   <div class="bar"><div id="jesperFill" class="bar-fill"></div></div>
 </div>
 
+<div id="jesperHelper" class="jesper-helper hidden">
+  <img src="jesper.png" alt="Jesper helper">
+</div>
+
 <div class="selector">
   <div class="selector-title">Choose Person</div>
   <div id="personButtons"></div>
@@ -351,7 +403,7 @@
 <img class="hammer-cursor" src="hammer.png" alt="">
 
 <script>
-const SAVE_KEY = "bankHamSaveV4";
+const SAVE_KEY = "bankHamSaveV5";
 
 const target = document.getElementById("target");
 const hammer = document.querySelector(".hammer-cursor");
@@ -370,6 +422,7 @@ const jesperPanel = document.getElementById("jesperPanel");
 const jesperTimer = document.getElementById("jesperTimer");
 const jesperClicksText = document.getElementById("jesperClicks");
 const jesperFill = document.getElementById("jesperFill");
+const jesperHelper = document.getElementById("jesperHelper");
 
 const people = [
   {
@@ -377,14 +430,8 @@ const people = [
     file: "steen.png",
     unlockAt: 0,
     maxHp: 100,
-    bubbles: [
-      "hvad fanden var det!!!!",
-      "jeg fik den LIGE på hovedt!!!!"
-    ],
-    rareBubbles: [
-      "walla jeg rammer tilbage din lille taber!!!!",
-      "fedt evan, fedt du har kage med"
-    ]
+    bubbles: ["hvad fanden var det!!!!", "jeg fik den LIGE på hovedt!!!!"],
+    rareBubbles: ["walla jeg rammer tilbage din lille taber!!!!", "fedt evan, fedt du har kage med"]
   },
   {
     name: "Britta",
@@ -395,23 +442,18 @@ const people = [
       "jeg skriver hjem!!!!!!",
       "ud fra klassen nu.",
       "drenge.",
-      "Hørte i det der? var min hjerte blev knust",
+      "det her et stille rum",
       "ned i teskten op i karakter",
       "alle sammen skal have mullighed at lære"
     ],
-    rareBubbles: [
-      "jeg chopper dig ned walla"
-    ]
+    rareBubbles: ["jeg chopper dig ned walla"]
   },
   {
     name: "Mette",
     file: "mette1000.jpg",
     unlockAt: 1750,
     maxHp: 240,
-    bubbles: [
-      "jeg gider ikk at diskuter",
-      "ej jeg kan ikke tænke idag"
-    ],
+    bubbles: ["jeg gider ikk at diskuter", "BOWLLINGGGGGGG"],
     rareBubbles: []
   }
 ];
@@ -434,7 +476,6 @@ let jesperEventTimer = null;
 function loadGame() {
   try {
     const saved = JSON.parse(localStorage.getItem(SAVE_KEY));
-
     if (!saved) return;
 
     hits = saved.hits || 0;
@@ -509,8 +550,18 @@ function updateLevelText() {
   }
 
   passiveText.textContent = jesperPassiveUnlocked
-    ? "Jesper passive: +10 CPS"
+    ? "Jesper passive: trimmer throw +10"
     : "Jesper passive: locked";
+
+  updateJesperHelper();
+}
+
+function updateJesperHelper() {
+  if (jesperPassiveUnlocked && !jesperEventActive) {
+    jesperHelper.classList.remove("hidden");
+  } else {
+    jesperHelper.classList.add("hidden");
+  }
 }
 
 function updateHp() {
@@ -578,13 +629,8 @@ function renderPersonButtons() {
       ? person.name
       : person.name + " - locked";
 
-    if (index === selectedPerson) {
-      button.classList.add("active");
-    }
-
-    if (!isUnlocked(index)) {
-      button.classList.add("locked");
-    }
+    if (index === selectedPerson) button.classList.add("active");
+    if (!isUnlocked(index)) button.classList.add("locked");
 
     button.addEventListener("click", function() {
       if (jesperEventActive) {
@@ -659,6 +705,65 @@ function maybeShowBubble() {
   }
 }
 
+function showJesperHelperBubble() {
+  if (Math.random() > 0.08) return;
+
+  const oldBubble = jesperHelper.querySelector(".helper-bubble");
+  if (oldBubble) oldBubble.remove();
+
+  const bubble = document.createElement("div");
+  bubble.className = "helper-bubble";
+  bubble.textContent = "Fri fra skole!";
+  jesperHelper.appendChild(bubble);
+
+  setTimeout(function() {
+    bubble.remove();
+  }, 1600);
+}
+
+function throwTrimmerFromJesper() {
+  if (!jesperPassiveUnlocked || jesperEventActive) return;
+
+  const helperRect = jesperHelper.getBoundingClientRect();
+  const targetRect = target.getBoundingClientRect();
+
+  const startX = helperRect.left + helperRect.width * 0.55;
+  const startY = helperRect.top + helperRect.height * 0.35;
+  const endX = targetRect.left + targetRect.width * 0.5;
+  const endY = targetRect.top + targetRect.height * 0.5;
+
+  const projectile = document.createElement("img");
+  projectile.className = "trimmer-projectile";
+  projectile.src = "trimmer.png";
+  projectile.alt = "";
+
+  projectile.style.left = startX + "px";
+  projectile.style.top = startY + "px";
+  projectile.style.transform = "translate(-50%, -50%) rotate(0deg)";
+
+  document.body.appendChild(projectile);
+
+  jesperHelper.classList.remove("throwing");
+  void jesperHelper.offsetWidth;
+  jesperHelper.classList.add("throwing");
+
+  requestAnimationFrame(function() {
+    projectile.style.transform =
+      "translate(" + (endX - startX - 29) + "px, " + (endY - startY - 29) + "px) rotate(720deg)";
+  });
+
+  setTimeout(function() {
+    projectile.remove();
+
+    clickTimes.push(Date.now());
+    addHits(10);
+    damagePerson(10);
+    createHitEffect(endX, endY, true);
+    animateTarget();
+    showJesperHelperBubble();
+  }, 480);
+}
+
 function maybeStartJesperEvent() {
   if (jesperPassiveUnlocked || jesperEventActive || hits < 250) return;
 
@@ -670,10 +775,10 @@ function maybeStartJesperEvent() {
     };
 
     testImage.onerror = function() {
-      showBubble("Upload jesper.jpg first!", true);
+      showBubble("Upload jesper.png first!", true);
     };
 
-    testImage.src = "jesper.jpg";
+    testImage.src = "jesper.png";
   }
 }
 
@@ -684,10 +789,11 @@ function startJesperEvent() {
 
   document.body.classList.add("event-active");
   jesperPanel.classList.remove("hidden");
-  target.src = "jesper.jpg";
+  target.src = "jesper.png";
   target.alt = "Jesper";
   hammer.src = "trimmer.png";
 
+  updateJesperHelper();
   showBubble("JESPER APPEARED! 100 clicks in 10 seconds!", true);
   updateJesperEvent();
 
@@ -723,11 +829,12 @@ function finishJesperEvent(success) {
 
   if (success) {
     jesperPassiveUnlocked = true;
-    showBubble("Jesper passive unlocked! +10 CPS!", true);
+    showBubble("Jesper passive unlocked! Trimmer throws!", true);
   } else {
     showBubble("Jesper escaped!", true);
   }
 
+  updateJesperHelper();
   updateHp();
   updateLevelText();
   scheduleSave();
@@ -787,6 +894,8 @@ target.addEventListener("click", function(e) {
     if (jesperEventClicks >= 100) {
       finishJesperEvent(true);
     }
+
+    createHitEffect(e.clientX, e.clientY, false);
   } else {
     const critical = Math.random() < 0.02;
     const damage = critical ? 10 : 1;
@@ -795,26 +904,14 @@ target.addEventListener("click", function(e) {
     damagePerson(damage);
     maybeShowBubble();
     maybeStartJesperEvent();
-
     createHitEffect(e.clientX, e.clientY, critical);
-  }
-
-  if (jesperEventActive) {
-    createHitEffect(e.clientX, e.clientY, false);
   }
 
   animateTarget();
 });
 
 setInterval(updateCps, 100);
-
-setInterval(function() {
-  if (!jesperPassiveUnlocked || jesperEventActive) return;
-
-  clickTimes.push(Date.now());
-  addHits(1);
-  damagePerson(1);
-}, 100);
+setInterval(throwTrimmerFromJesper, 1000);
 
 window.addEventListener("beforeunload", saveGameNow);
 
@@ -826,6 +923,7 @@ updateLevelText();
 updateHp();
 updateCombo();
 renderPersonButtons();
+updateJesperHelper();
 </script>
 
 </body>
