@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Bank Dem</title>
+<title>Bank Ham</title>
 
 <style>
   * { box-sizing: border-box; }
@@ -81,7 +81,7 @@
 
   .scoreboard {
     right: 25px;
-    top: 105px;
+    top: 88px;
   }
 
   .selector {
@@ -89,32 +89,32 @@
     top: 120px;
   }
 
-  .score-label, .cps-label, .level-label, .selector-title, .combo-label, .hp-label {
-    font-size: 1.25rem;
+  .score-label, .cps-label, .level-label, .selector-title, .combo-label, .hp-label, .stone-label {
+    font-size: 1.2rem;
     color: #ffdf5d;
   }
 
   #score {
-    font-size: 4rem;
+    font-size: 3.5rem;
     font-weight: bold;
     line-height: 1;
-    margin-bottom: 14px;
+    margin-bottom: 12px;
   }
 
-  #cps, #level, #combo {
-    font-size: 2.4rem;
+  #cps, #level, #combo, #stones {
+    font-size: 2.15rem;
     font-weight: bold;
   }
 
   .panel-section {
     border-top: 2px solid rgba(255, 223, 93, 0.45);
-    padding-top: 12px;
-    margin-top: 12px;
+    padding-top: 11px;
+    margin-top: 11px;
   }
 
-  #nextUnlock, #saveText, #passiveText {
+  #nextUnlock, #saveText, #passiveText, #attackText {
     margin-top: 8px;
-    font-size: 0.95rem;
+    font-size: 0.92rem;
     opacity: 0.85;
   }
 
@@ -157,6 +157,186 @@
   .person-button.locked {
     opacity: 0.45;
     border-color: #777;
+  }
+
+  .shop-toggle {
+    position: fixed;
+    right: 25px;
+    bottom: 25px;
+    z-index: 130;
+    padding: 14px 22px;
+    border: 3px solid #ffdf5d;
+    background: #151515;
+    color: #ffdf5d;
+    border-radius: 14px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: none;
+    box-shadow: 0 0 28px rgba(255, 223, 93, 0.28);
+  }
+
+  .shop-toggle.open {
+    background: #ffdf5d;
+    color: #111;
+  }
+
+  .shop-panel {
+    position: fixed;
+    right: 0;
+    top: 0;
+    height: 100vh;
+    width: 340px;
+    padding: 22px;
+    background: rgba(8, 8, 8, 0.96);
+    border-left: 4px solid #ffdf5d;
+    box-shadow: -18px 0 50px rgba(0, 0, 0, 0.55);
+    z-index: 120;
+    transform: translateX(110%);
+    transition: transform 0.22s ease;
+    text-align: left;
+  }
+
+  .shop-panel.open {
+    transform: translateX(0);
+  }
+
+  .shop-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .shop-title {
+    color: #ffdf5d;
+    font-size: 2rem;
+    font-weight: bold;
+  }
+
+  .shop-subtitle {
+    margin-top: 4px;
+    color: rgba(255, 255, 255, 0.72);
+    font-size: 0.92rem;
+  }
+
+  .shop-close {
+    width: 42px;
+    height: 42px;
+    border: 2px solid #ffdf5d;
+    background: #151515;
+    color: #ffdf5d;
+    border-radius: 10px;
+    font-size: 1.7rem;
+    line-height: 1;
+    font-weight: bold;
+    cursor: none;
+  }
+
+  .shop-stones {
+    margin: 20px 0 14px;
+    padding: 14px;
+    border: 2px solid rgba(255, 223, 93, 0.75);
+    border-radius: 12px;
+    color: #ffdf5d;
+    font-size: 1.25rem;
+    font-weight: bold;
+    text-align: center;
+  }
+
+  .shop-item {
+    display: grid;
+    grid-template-columns: 64px 1fr;
+    gap: 12px;
+    padding: 14px;
+    margin-top: 14px;
+    border: 2px solid rgba(255, 223, 93, 0.55);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.045);
+  }
+
+  .shop-item.owned {
+    border-color: #75ff9b;
+  }
+
+  .shop-item img {
+    width: 64px;
+    height: 64px;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 2px solid rgba(255, 223, 93, 0.65);
+    background: #222;
+  }
+
+  .shop-item-title {
+    color: white;
+    font-size: 1.15rem;
+    font-weight: bold;
+  }
+
+  .shop-item-desc {
+    margin-top: 4px;
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 0.9rem;
+    line-height: 1.3;
+  }
+
+  .buy-button {
+    grid-column: 1 / -1;
+    padding: 10px;
+    border: 2px solid #ffdf5d;
+    background: #ffdf5d;
+    color: #111;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: none;
+  }
+
+  .buy-button:disabled {
+    opacity: 0.55;
+    background: #333;
+    color: white;
+    border-color: #777;
+  }
+
+  .helper-rack {
+    position: fixed;
+    left: 50%;
+    bottom: 24px;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 12px;
+    z-index: 65;
+    pointer-events: none;
+  }
+
+  .helper-chip {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    border: 2px solid #75ff9b;
+    border-radius: 14px;
+    background: rgba(0, 0, 0, 0.74);
+    box-shadow: 0 0 20px rgba(117, 255, 155, 0.22);
+  }
+
+  .helper-chip img {
+    width: 44px;
+    height: 44px;
+    object-fit: cover;
+    border-radius: 10px;
+  }
+
+  .helper-chip-text {
+    text-align: left;
+    font-size: 0.88rem;
+    line-height: 1.2;
+  }
+
+  .helper-chip-name {
+    color: #75ff9b;
+    font-weight: bold;
   }
 
   .event-panel {
@@ -369,9 +549,26 @@
 
 <h1>Bank Ham</h1>
 
+<button id="shopToggle" class="shop-toggle">Shop</button>
+
+<div id="shopPanel" class="shop-panel">
+  <div class="shop-header">
+    <div>
+      <div class="shop-title">Helper Shop</div>
+      <div class="shop-subtitle">Buy students with stones. Buffs only work against their teacher.</div>
+    </div>
+    <button id="shopClose" class="shop-close">×</button>
+  </div>
+
+  <div class="shop-stones">Stones: <span id="shopStones">0</span></div>
+  <div id="shopItems"></div>
+</div>
+
+<div id="helperRack" class="helper-rack hidden"></div>
+
 <div id="jesperPanel" class="event-panel hidden">
   <div class="event-title">JESPER EVENT</div>
-  <div id="jesperTimer">12.0s</div>
+  <div id="jesperTimer">10.0s</div>
   <div id="jesperClicks">0 / 100 clicks</div>
   <div class="bar"><div id="jesperFill" class="bar-fill"></div></div>
 </div>
@@ -390,6 +587,11 @@
   <div id="score">0</div>
 
   <div class="panel-section">
+    <div class="stone-label">Stones</div>
+    <div id="stones">0</div>
+  </div>
+
+  <div class="panel-section">
     <div class="cps-label">CPS</div>
     <div id="cps">0.0</div>
   </div>
@@ -404,6 +606,7 @@
     <div class="hp-label" id="hpLabel">HP</div>
     <div id="hpText">100 / 100</div>
     <div class="bar"><div id="hpFill" class="bar-fill"></div></div>
+    <div id="attackText">Attack: 1 damage</div>
   </div>
 
   <div class="panel-section">
@@ -427,6 +630,8 @@ const SAVE_KEY = "bankHamSaveV5";
 const target = document.getElementById("target");
 const hammer = document.querySelector(".hammer-cursor");
 const score = document.getElementById("score");
+const stonesText = document.getElementById("stones");
+const shopStones = document.getElementById("shopStones");
 const cps = document.getElementById("cps");
 const level = document.getElementById("level");
 const nextUnlock = document.getElementById("nextUnlock");
@@ -437,11 +642,17 @@ const comboFill = document.getElementById("comboFill");
 const hpLabel = document.getElementById("hpLabel");
 const hpText = document.getElementById("hpText");
 const hpFill = document.getElementById("hpFill");
+const attackText = document.getElementById("attackText");
 const jesperPanel = document.getElementById("jesperPanel");
 const jesperTimer = document.getElementById("jesperTimer");
 const jesperClicksText = document.getElementById("jesperClicks");
 const jesperFill = document.getElementById("jesperFill");
 const jesperHelper = document.getElementById("jesperHelper");
+const shopToggle = document.getElementById("shopToggle");
+const shopClose = document.getElementById("shopClose");
+const shopPanel = document.getElementById("shopPanel");
+const shopItems = document.getElementById("shopItems");
+const helperRack = document.getElementById("helperRack");
 
 const people = [
   {
@@ -483,7 +694,27 @@ const people = [
   }
 ];
 
+const helpers = [
+  {
+    id: "mussen",
+    name: "Mussen",
+    file: "mussen.png",
+    price: 250,
+    targetName: "Britta",
+    bonus: 10
+  },
+  {
+    id: "gusse",
+    name: "Gusse",
+    file: "gusse.png",
+    price: 700,
+    targetName: "Mette",
+    bonus: 20
+  }
+];
+
 let hits = 0;
+let stones = 0;
 let clickTimes = [];
 let selectedPerson = 0;
 let hpByPerson = people.map(person => person.maxHp);
@@ -491,6 +722,8 @@ let comboCount = 0;
 let lastClickTime = 0;
 let comboResetTimer = null;
 let saveTimer = null;
+let shopOpen = false;
+let ownedHelpers = {};
 
 let jesperPassiveUnlocked = false;
 let jesperEventActive = false;
@@ -499,15 +732,27 @@ let jesperEventEndTime = 0;
 let jesperEventTimer = null;
 let jesperMisses = 0;
 
+helpers.forEach(function(helper) {
+  ownedHelpers[helper.id] = false;
+});
+
 function loadGame() {
   try {
     const saved = JSON.parse(localStorage.getItem(SAVE_KEY));
     if (!saved) return;
 
     hits = saved.hits || 0;
+    stones = saved.stones || 0;
     selectedPerson = saved.selectedPerson || 0;
     jesperPassiveUnlocked = saved.jesperPassiveUnlocked || false;
     jesperMisses = saved.jesperMisses || 0;
+    shopOpen = saved.shopOpen || false;
+
+    if (saved.ownedHelpers) {
+      helpers.forEach(function(helper) {
+        ownedHelpers[helper.id] = saved.ownedHelpers[helper.id] || false;
+      });
+    }
 
     if (Array.isArray(saved.hpByPerson)) {
       hpByPerson = people.map(function(person, index) {
@@ -527,10 +772,13 @@ function saveGameNow() {
   try {
     localStorage.setItem(SAVE_KEY, JSON.stringify({
       hits: hits,
+      stones: stones,
       selectedPerson: selectedPerson,
       jesperPassiveUnlocked: jesperPassiveUnlocked,
       jesperMisses: jesperMisses,
-      hpByPerson: hpByPerson
+      hpByPerson: hpByPerson,
+      ownedHelpers: ownedHelpers,
+      shopOpen: shopOpen
     }));
   } catch (error) {
     console.log("Could not save game.");
@@ -552,12 +800,57 @@ function isUnlocked(personIndex) {
   return hits >= people[personIndex].unlockAt;
 }
 
+function updateMoneyText() {
+  stonesText.textContent = stones;
+  shopStones.textContent = stones;
+}
+
+function addStones(amount) {
+  stones += amount;
+  updateMoneyText();
+  renderShop();
+  scheduleSave();
+}
+
 function addHits(amount) {
   hits += amount;
   score.textContent = hits;
   updateLevelText();
   renderPersonButtons();
+  renderShop();
   scheduleSave();
+}
+
+function getHelperBonus() {
+  if (jesperEventActive) return 0;
+
+  const selectedName = people[selectedPerson].name;
+
+  return helpers.reduce(function(total, helper) {
+    if (ownedHelpers[helper.id] && helper.targetName === selectedName) {
+      return total + helper.bonus;
+    }
+
+    return total;
+  }, 0);
+}
+
+function getAttackDamage(baseDamage) {
+  return baseDamage + getHelperBonus();
+}
+
+function updateAttackText() {
+  if (jesperEventActive) {
+    attackText.textContent = "Event attack: 1 click";
+    return;
+  }
+
+  const bonus = getHelperBonus();
+  const damage = getAttackDamage(1);
+
+  attackText.textContent = bonus > 0
+    ? "Attack: " + damage + " damage (+" + bonus + " helper)"
+    : "Attack: " + damage + " damage";
 }
 
 function updateCps() {
@@ -582,6 +875,7 @@ function updateLevelText() {
     : "Jesper passive: locked";
 
   updateJesperHelper();
+  updateAttackText();
 }
 
 function updateJesperHelper() {
@@ -597,6 +891,7 @@ function updateHp() {
     hpLabel.textContent = "Jesper Goal";
     hpText.textContent = jesperEventClicks + " / 100";
     hpFill.style.width = jesperEventClicks + "%";
+    updateAttackText();
     return;
   }
 
@@ -606,6 +901,7 @@ function updateHp() {
   hpLabel.textContent = person.name + " HP";
   hpText.textContent = hp + " / " + person.maxHp;
   hpFill.style.width = ((hp / person.maxHp) * 100) + "%";
+  updateAttackText();
 }
 
 function damagePerson(amount) {
@@ -676,12 +972,126 @@ function renderPersonButtons() {
       target.alt = person.name;
       renderPersonButtons();
       updateHp();
+      renderShop();
       showBubble(person.name + " selected!", false);
       scheduleSave();
     });
 
     personButtons.appendChild(button);
   });
+}
+
+function updateShopVisibility() {
+  shopPanel.classList.toggle("open", shopOpen);
+  shopToggle.classList.toggle("open", shopOpen);
+  shopToggle.textContent = shopOpen ? "Close Shop" : "Shop";
+}
+
+function renderShop() {
+  shopItems.innerHTML = "";
+  updateMoneyText();
+
+  helpers.forEach(function(helper) {
+    const owned = ownedHelpers[helper.id];
+    const item = document.createElement("div");
+    item.className = owned ? "shop-item owned" : "shop-item";
+
+    const image = document.createElement("img");
+    image.src = helper.file;
+    image.alt = helper.name;
+    image.onerror = function() {
+      image.style.display = "none";
+    };
+
+    const text = document.createElement("div");
+
+    const title = document.createElement("div");
+    title.className = "shop-item-title";
+    title.textContent = helper.name;
+
+    const description = document.createElement("div");
+    description.className = "shop-item-desc";
+    description.textContent = "+" + helper.bonus + " damage against " + helper.targetName + " only.";
+
+    text.appendChild(title);
+    text.appendChild(description);
+
+    const button = document.createElement("button");
+    button.className = "buy-button";
+
+    if (owned) {
+      button.textContent = "Owned";
+      button.disabled = true;
+    } else if (stones < helper.price) {
+      button.textContent = helper.price + " stones";
+      button.disabled = true;
+    } else {
+      button.textContent = "Buy for " + helper.price + " stones";
+      button.addEventListener("click", function() {
+        buyHelper(helper.id);
+      });
+    }
+
+    item.appendChild(image);
+    item.appendChild(text);
+    item.appendChild(button);
+    shopItems.appendChild(item);
+  });
+}
+
+function renderHelperRack() {
+  helperRack.innerHTML = "";
+
+  const owned = helpers.filter(function(helper) {
+    return ownedHelpers[helper.id];
+  });
+
+  if (owned.length === 0) {
+    helperRack.classList.add("hidden");
+    return;
+  }
+
+  helperRack.classList.remove("hidden");
+
+  owned.forEach(function(helper) {
+    const chip = document.createElement("div");
+    chip.className = "helper-chip";
+
+    const image = document.createElement("img");
+    image.src = helper.file;
+    image.alt = helper.name;
+
+    const text = document.createElement("div");
+    text.className = "helper-chip-text";
+    text.innerHTML =
+      "<div class=\"helper-chip-name\">" + helper.name + "</div>" +
+      "<div>+" + helper.bonus + " vs " + helper.targetName + "</div>";
+
+    chip.appendChild(image);
+    chip.appendChild(text);
+    helperRack.appendChild(chip);
+  });
+}
+
+function buyHelper(helperId) {
+  const helper = helpers.find(item => item.id === helperId);
+
+  if (!helper || ownedHelpers[helperId]) return;
+
+  if (stones < helper.price) {
+    showBubble("Need " + helper.price + " stones!", false);
+    return;
+  }
+
+  stones -= helper.price;
+  ownedHelpers[helperId] = true;
+
+  updateMoneyText();
+  updateAttackText();
+  renderShop();
+  renderHelperRack();
+  scheduleSave();
+  showBubble(helper.name + " joined your helpers!", true);
 }
 
 function showBubble(text, rare) {
@@ -781,15 +1191,18 @@ function throwTrimmerFromJesper() {
   });
 
   setTimeout(function() {
+    const damage = getAttackDamage(10);
+
     projectile.remove();
 
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < damage; i++) {
       clickTimes.push(Date.now());
     }
 
-    addHits(10);
-    damagePerson(10);
-    createHitEffect(endX, endY, true);
+    addHits(damage);
+    addStones(1);
+    damagePerson(damage);
+    createHitEffect(endX, endY, true, damage, "TRIMMER +" + damage);
     animateTarget();
     showJesperHelperBubble();
   }, 480);
@@ -896,7 +1309,7 @@ function finishJesperEvent(success) {
   scheduleSave();
 }
 
-function createHitEffect(x, y, critical) {
+function createHitEffect(x, y, critical, amount, label) {
   const effect = document.createElement("div");
   effect.className = "hit-effect";
   effect.innerHTML = critical ? "💥" : "💢";
@@ -908,10 +1321,10 @@ function createHitEffect(x, y, critical) {
     effect.remove();
   }, 500);
 
-  if (critical) {
+  if (critical || label) {
     const crit = document.createElement("div");
     crit.className = "critical-effect";
-    crit.textContent = "CRITICAL +10";
+    crit.textContent = label || "CRITICAL +" + amount;
     crit.style.left = x + "px";
     crit.style.top = (y - 35) + "px";
     document.body.appendChild(crit);
@@ -938,9 +1351,22 @@ window.addEventListener("mousemove", function(e) {
   hammer.style.top = e.clientY + "px";
 });
 
+shopToggle.addEventListener("click", function() {
+  shopOpen = !shopOpen;
+  updateShopVisibility();
+  scheduleSave();
+});
+
+shopClose.addEventListener("click", function() {
+  shopOpen = false;
+  updateShopVisibility();
+  scheduleSave();
+});
+
 target.addEventListener("click", function(e) {
   clickTimes.push(Date.now());
   registerComboClick();
+  addStones(1);
 
   if (jesperEventActive) {
     jesperEventClicks++;
@@ -951,16 +1377,17 @@ target.addEventListener("click", function(e) {
       finishJesperEvent(true);
     }
 
-    createHitEffect(e.clientX, e.clientY, false);
+    createHitEffect(e.clientX, e.clientY, false, 1);
   } else {
     const critical = Math.random() < 0.02;
-    const damage = critical ? 10 : 1;
+    const baseDamage = critical ? 10 : 1;
+    const damage = getAttackDamage(baseDamage);
 
     addHits(damage);
     damagePerson(damage);
     maybeShowBubble();
     maybeStartJesperEvent();
-    createHitEffect(e.clientX, e.clientY, critical);
+    createHitEffect(e.clientX, e.clientY, critical, damage);
   }
 
   animateTarget();
@@ -975,10 +1402,14 @@ loadGame();
 score.textContent = hits;
 target.src = people[selectedPerson].file;
 target.alt = people[selectedPerson].name;
+updateMoneyText();
 updateLevelText();
 updateHp();
 updateCombo();
 renderPersonButtons();
+renderShop();
+renderHelperRack();
+updateShopVisibility();
 updateJesperHelper();
 </script>
 
