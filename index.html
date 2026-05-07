@@ -60,7 +60,9 @@
     box-shadow: 0 0 35px #ffdf5d, 0 0 90px rgba(255, 223, 93, 0.45);
   }
 
-  #target.bonk { animation: bonk 0.16s ease; }
+  #target.bonk {
+    animation: bonk 0.16s ease;
+  }
 
   @keyframes bonk {
     0% { transform: scale(1) rotate(0deg); }
@@ -68,7 +70,8 @@
     100% { transform: scale(1) rotate(0deg); }
   }
 
-  .scoreboard, .selector {
+  .scoreboard,
+  .selector {
     position: fixed;
     width: 260px;
     padding: 20px;
@@ -89,7 +92,13 @@
     top: 120px;
   }
 
-  .score-label, .cps-label, .level-label, .selector-title, .combo-label, .hp-label, .stone-label {
+  .score-label,
+  .cps-label,
+  .level-label,
+  .selector-title,
+  .combo-label,
+  .hp-label,
+  .stone-label {
     font-size: 1.2rem;
     color: #ffdf5d;
   }
@@ -101,7 +110,10 @@
     margin-bottom: 12px;
   }
 
-  #cps, #level, #combo, #stones {
+  #cps,
+  #level,
+  #combo,
+  #stones {
     font-size: 2.15rem;
     font-weight: bold;
   }
@@ -112,7 +124,10 @@
     margin-top: 11px;
   }
 
-  #nextUnlock, #saveText, #passiveText, #attackText {
+  #nextUnlock,
+  #saveText,
+  #passiveText,
+  #attackText {
     margin-top: 8px;
     font-size: 0.92rem;
     opacity: 0.85;
@@ -134,7 +149,9 @@
     background: #ffdf5d;
   }
 
-  #hpFill { background: #ff4545; }
+  #hpFill {
+    background: #ff4545;
+  }
 
   .person-button {
     width: 100%;
@@ -355,11 +372,17 @@
     box-shadow: 0 0 35px rgba(255, 223, 93, 0.7);
   }
 
-  .hidden { display: none; }
+  .hidden {
+    display: none;
+  }
 
-  .event-title { font-size: 1.5rem; }
+  .event-title {
+    font-size: 1.5rem;
+  }
 
-  #jesperTimer { font-size: 2.4rem; }
+  #jesperTimer {
+    font-size: 2.4rem;
+  }
 
   .jesper-helper {
     position: fixed;
@@ -504,7 +527,9 @@
     transform-origin: 70% 70%;
   }
 
-  .hammer-cursor.swing { animation: hammerSwing 0.18s ease; }
+  .hammer-cursor.swing {
+    animation: hammerSwing 0.18s ease;
+  }
 
   @keyframes hammerSwing {
     0% { transform: translate(-22px, -20px) rotate(0deg); }
@@ -512,7 +537,8 @@
     100% { transform: translate(-22px, -20px) rotate(0deg); }
   }
 
-  .hit-effect, .critical-effect {
+  .hit-effect,
+  .critical-effect {
     position: fixed;
     left: 0;
     top: 0;
@@ -662,8 +688,14 @@ const people = [
     maxHp: 100,
     jesperChance: 0.004,
     jesperPityLimit: 260,
-    bubbles: ["hvad fanden var det!!!!", "jeg fik den LIGE på hovedt!!!!"],
-    rareBubbles: ["walla jeg rammer tilbage din lille taber!!!!", "fedt evan, fedt du har kage med"]
+    bubbles: [
+      "hvad fanden var det!!!!",
+      "jeg fik den LIGE på hovedt!!!!"
+    ],
+    rareBubbles: [
+      "walla jeg rammer tilbage din lille taber!!!!",
+      "fedt evan, fedt du har kage med"
+    ]
   },
   {
     name: "Britta",
@@ -680,7 +712,9 @@ const people = [
       "ned i teskten op i karakter",
       "alle sammen skal have mullighed at lære"
     ],
-    rareBubbles: ["jeg chopper dig ned walla"]
+    rareBubbles: [
+      "jeg chopper dig ned walla"
+    ]
   },
   {
     name: "Mette",
@@ -689,7 +723,10 @@ const people = [
     maxHp: 240,
     jesperChance: 0.006,
     jesperPityLimit: 200,
-    bubbles: ["jeg gider ikk at diskuter", "BOWLLINGGGGGGG"],
+    bubbles: [
+      "jeg gider ikk at diskuter",
+      "BOWLLINGGGGGGG"
+    ],
     rareBubbles: []
   }
 ];
@@ -808,7 +845,7 @@ function updateMoneyText() {
 function addStones(amount) {
   stones += amount;
   updateMoneyText();
-  renderShop();
+  updateShopButtons();
   scheduleSave();
 }
 
@@ -817,7 +854,6 @@ function addHits(amount) {
   score.textContent = hits;
   updateLevelText();
   renderPersonButtons();
-  renderShop();
   scheduleSave();
 }
 
@@ -855,7 +891,11 @@ function updateAttackText() {
 
 function updateCps() {
   const now = Date.now();
-  clickTimes = clickTimes.filter(time => now - time < 1000);
+
+  clickTimes = clickTimes.filter(function(time) {
+    return now - time < 1000;
+  });
+
   cps.textContent = clickTimes.length.toFixed(1);
 }
 
@@ -908,6 +948,7 @@ function damagePerson(amount) {
   if (jesperEventActive) return;
 
   const person = people[selectedPerson];
+
   hpByPerson[selectedPerson] -= amount;
 
   if (hpByPerson[selectedPerson] <= 0) {
@@ -937,6 +978,7 @@ function registerComboClick() {
   updateCombo();
 
   clearTimeout(comboResetTimer);
+
   comboResetTimer = setTimeout(function() {
     comboCount = 0;
     updateCombo();
@@ -948,13 +990,19 @@ function renderPersonButtons() {
 
   people.forEach(function(person, index) {
     const button = document.createElement("button");
+
     button.className = "person-button";
     button.textContent = isUnlocked(index)
       ? person.name
       : person.name + " - locked";
 
-    if (index === selectedPerson) button.classList.add("active");
-    if (!isUnlocked(index)) button.classList.add("locked");
+    if (index === selectedPerson) {
+      button.classList.add("active");
+    }
+
+    if (!isUnlocked(index)) {
+      button.classList.add("locked");
+    }
 
     button.addEventListener("click", function() {
       if (jesperEventActive) {
@@ -970,9 +1018,10 @@ function renderPersonButtons() {
       selectedPerson = index;
       target.src = person.file;
       target.alt = person.name;
+
       renderPersonButtons();
       updateHp();
-      renderShop();
+      renderHelperRack();
       showBubble(person.name + " selected!", false);
       scheduleSave();
     });
@@ -993,12 +1042,15 @@ function renderShop() {
 
   helpers.forEach(function(helper) {
     const owned = ownedHelpers[helper.id];
+
     const item = document.createElement("div");
     item.className = owned ? "shop-item owned" : "shop-item";
+    item.setAttribute("data-helper-item", helper.id);
 
     const image = document.createElement("img");
     image.src = helper.file;
     image.alt = helper.name;
+
     image.onerror = function() {
       image.style.display = "none";
     };
@@ -1018,6 +1070,33 @@ function renderShop() {
 
     const button = document.createElement("button");
     button.className = "buy-button";
+    button.setAttribute("data-helper-button", helper.id);
+
+    button.addEventListener("click", function() {
+      buyHelper(helper.id);
+    });
+
+    item.appendChild(image);
+    item.appendChild(text);
+    item.appendChild(button);
+    shopItems.appendChild(item);
+  });
+
+  updateShopButtons();
+}
+
+function updateShopButtons() {
+  updateMoneyText();
+
+  helpers.forEach(function(helper) {
+    const item = shopItems.querySelector("[data-helper-item=\"" + helper.id + "\"]");
+    const button = shopItems.querySelector("[data-helper-button=\"" + helper.id + "\"]");
+
+    if (!item || !button) return;
+
+    const owned = ownedHelpers[helper.id];
+
+    item.classList.toggle("owned", owned);
 
     if (owned) {
       button.textContent = "Owned";
@@ -1027,23 +1106,18 @@ function renderShop() {
       button.disabled = true;
     } else {
       button.textContent = "Buy for " + helper.price + " stones";
-      button.addEventListener("click", function() {
-        buyHelper(helper.id);
-      });
+      button.disabled = false;
     }
-
-    item.appendChild(image);
-    item.appendChild(text);
-    item.appendChild(button);
-    shopItems.appendChild(item);
   });
 }
 
 function renderHelperRack() {
   helperRack.innerHTML = "";
 
+  const selectedName = people[selectedPerson].name;
+
   const owned = helpers.filter(function(helper) {
-    return ownedHelpers[helper.id];
+    return ownedHelpers[helper.id] && helper.targetName === selectedName;
   });
 
   if (owned.length === 0) {
@@ -1063,6 +1137,7 @@ function renderHelperRack() {
 
     const text = document.createElement("div");
     text.className = "helper-chip-text";
+
     text.innerHTML =
       "<div class=\"helper-chip-name\">" + helper.name + "</div>" +
       "<div>+" + helper.bonus + " vs " + helper.targetName + "</div>";
@@ -1074,7 +1149,9 @@ function renderHelperRack() {
 }
 
 function buyHelper(helperId) {
-  const helper = helpers.find(item => item.id === helperId);
+  const helper = helpers.find(function(item) {
+    return item.id === helperId;
+  });
 
   if (!helper || ownedHelpers[helperId]) return;
 
@@ -1088,7 +1165,7 @@ function buyHelper(helperId) {
 
   updateMoneyText();
   updateAttackText();
-  renderShop();
+  updateShopButtons();
   renderHelperRack();
   scheduleSave();
   showBubble(helper.name + " joined your helpers!", true);
@@ -1147,11 +1224,15 @@ function showJesperHelperBubble() {
   if (Math.random() > 0.03) return;
 
   const oldBubble = jesperHelper.querySelector(".helper-bubble");
-  if (oldBubble) oldBubble.remove();
+
+  if (oldBubble) {
+    oldBubble.remove();
+  }
 
   const bubble = document.createElement("div");
   bubble.className = "helper-bubble";
   bubble.textContent = "Fri fra skole!";
+
   jesperHelper.appendChild(bubble);
 
   setTimeout(function() {
@@ -1171,6 +1252,7 @@ function throwTrimmerFromJesper() {
   const endY = targetRect.top + targetRect.height * 0.5;
 
   const projectile = document.createElement("img");
+
   projectile.className = "trimmer-projectile";
   projectile.src = "trimmer.png";
   projectile.alt = "";
@@ -1191,7 +1273,7 @@ function throwTrimmerFromJesper() {
   });
 
   setTimeout(function() {
-    const damage = getAttackDamage(10);
+    const damage = 10;
 
     projectile.remove();
 
@@ -1203,7 +1285,7 @@ function throwTrimmerFromJesper() {
     addStones(1);
     damagePerson(damage);
     createHitEffect(endX, endY, true, damage, "TRIMMER +" + damage);
-    animateTarget();
+    animateTarget(false);
     showJesperHelperBubble();
   }, 480);
 }
@@ -1257,6 +1339,7 @@ function startJesperEvent() {
 
   document.body.classList.add("event-active");
   jesperPanel.classList.remove("hidden");
+
   target.src = "jesper.jpg";
   target.alt = "Jesper";
   hammer.src = "trimmer.png";
@@ -1279,6 +1362,7 @@ function updateJesperEvent() {
   jesperTimer.textContent = seconds + "s";
   jesperClicksText.textContent = jesperEventClicks + " / 100 clicks";
   jesperFill.style.width = jesperEventClicks + "%";
+
   updateHp();
 
   if (timeLeft <= 0 && jesperEventClicks < 100) {
@@ -1288,10 +1372,12 @@ function updateJesperEvent() {
 
 function finishJesperEvent(success) {
   jesperEventActive = false;
+
   clearInterval(jesperEventTimer);
 
   document.body.classList.remove("event-active");
   jesperPanel.classList.add("hidden");
+
   hammer.src = "hammer.png";
   target.src = people[selectedPerson].file;
   target.alt = people[selectedPerson].name;
@@ -1311,10 +1397,12 @@ function finishJesperEvent(success) {
 
 function createHitEffect(x, y, critical, amount, label) {
   const effect = document.createElement("div");
+
   effect.className = "hit-effect";
   effect.innerHTML = critical ? "💥" : "💢";
   effect.style.left = x + "px";
   effect.style.top = y + "px";
+
   document.body.appendChild(effect);
 
   setTimeout(function() {
@@ -1323,10 +1411,12 @@ function createHitEffect(x, y, critical, amount, label) {
 
   if (critical || label) {
     const crit = document.createElement("div");
+
     crit.className = "critical-effect";
     crit.textContent = label || "CRITICAL +" + amount;
     crit.style.left = x + "px";
     crit.style.top = (y - 35) + "px";
+
     document.body.appendChild(crit);
 
     setTimeout(function() {
@@ -1335,15 +1425,24 @@ function createHitEffect(x, y, critical, amount, label) {
   }
 }
 
-function animateTarget() {
+function animateTarget(swingHammer) {
   target.classList.remove("bonk");
-  hammer.classList.remove("swing");
+
+  if (swingHammer !== false) {
+    hammer.classList.remove("swing");
+  }
 
   void target.offsetWidth;
-  void hammer.offsetWidth;
+
+  if (swingHammer !== false) {
+    void hammer.offsetWidth;
+  }
 
   target.classList.add("bonk");
-  hammer.classList.add("swing");
+
+  if (swingHammer !== false) {
+    hammer.classList.add("swing");
+  }
 }
 
 window.addEventListener("mousemove", function(e) {
@@ -1399,9 +1498,11 @@ setInterval(throwTrimmerFromJesper, 1000);
 window.addEventListener("beforeunload", saveGameNow);
 
 loadGame();
+
 score.textContent = hits;
 target.src = people[selectedPerson].file;
 target.alt = people[selectedPerson].name;
+
 updateMoneyText();
 updateLevelText();
 updateHp();
